@@ -15,6 +15,7 @@ internal class ErrorHandlerTest : TestBase
     [Test]
     public void Should_Throw_Error_When_ThrowErrorOnFailure_Is_True()
     {
+        // Inject the fake path into the default input.
         var input = DefaultInput();
         input.FilePath = fakePath;
 
@@ -27,6 +28,7 @@ internal class ErrorHandlerTest : TestBase
     [Test]
     public void Should_Return_Failed_Result_When_ThrowErrorOnFailure_Is_False()
     {
+        // Inject the fake path into the default input.
         var input = DefaultInput();
         input.FilePath = fakePath;
 
@@ -41,6 +43,7 @@ internal class ErrorHandlerTest : TestBase
     [Test]
     public void Should_Use_Custom_ErrorMessageOnFailure()
     {
+        // Inject the fake path into the default input.
         var input = DefaultInput();
         input.FilePath = fakePath;
 
