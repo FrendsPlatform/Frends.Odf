@@ -1,6 +1,6 @@
+using System;
 using System.Threading;
 using NUnit.Framework;
-using Frends.Odf.ReadTextDocument.Definitions;
 
 namespace Frends.Odf.ReadTextDocument.Tests;
 
@@ -8,28 +8,13 @@ namespace Frends.Odf.ReadTextDocument.Tests;
 internal class FunctionalTests : TestBase
 {
     [Test]
-    public void ShouldRepeatContentWithDelimiter()
+    public void Should_Extract_File_Content()
     {
-        var input = new Input
-        {
-            Content = "foobar",
-            Repeat = 3,
-        };
+        var result = Odf.ReadTextDocument(DefaultInput(), DefaultOptions(), CancellationToken.None);
 
-        var connection = new Connection
-        {
-            ConnectionString = "Host=127.0.0.1;Port=12345",
-        };
+        Assert.IsTrue(result.Success, "Task failed to execute successfully.");
 
-        var options = new Options
-        {
-            Delimiter = ", ",
-            ThrowErrorOnFailure = true,
-            ErrorMessageOnFailure = null,
-        };
-
-        var result = Odf.ReadTextDocument(input, connection, options, CancellationToken.None);
-
-        Assert.That(result.Output, Is.EqualTo("foobar, foobar, foobar"));
+        var expectedOutput = "Test Heading" + Environment.NewLine + "Test paragraph 1." + Environment.NewLine + "Test paragraph 2.";
+        Assert.AreEqual(expectedOutput, result.Content);
     }
 }

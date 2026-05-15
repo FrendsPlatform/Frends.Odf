@@ -3,7 +3,9 @@
         <TargetFramework>net8.0</TargetFramework>
         <IsPackable>false</IsPackable>
         <Nullable>disable</Nullable>
-    </PropertyGroup>
+		<LangVersion>preview</LangVersion>
+		<EnablePreviewFeatures>true</EnablePreviewFeatures>
+	</PropertyGroup>
 
     <ItemGroup>
         <ProjectReference Include="..\Frends.Odf.ReadTextDocument\Frends.Odf.ReadTextDocument.csproj"/>

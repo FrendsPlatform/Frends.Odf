@@ -1,28 +1,49 @@
 using System;
-using dotenv.net;
+using System.IO;
+using System.IO.Compression;
 using Frends.Odf.ReadTextDocument.Definitions;
+using NUnit.Framework;
 
 namespace Frends.Odf.ReadTextDocument.Tests;
 
 internal abstract class TestBase
 {
-    internal TestBase()
+    protected string ValidTestFilePath { get; private set; }
+
+    [SetUp]
+    public void SetupBase()
     {
-        // TODO: Here you can load environment variables used in tests
-        DotEnv.Load();
-        SecretKey = GetEnvVar("FRENDS_SECRET_KEY");
+        ValidTestFilePath = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString() + ".odt");
+
+        using var archive = ZipFile.Open(ValidTestFilePath, ZipArchiveMode.Create);
+        var entry = archive.CreateEntry("content.xml");
+        using var writer = new StreamWriter(entry.Open());
+
+        writer.Write(@"<?xml version=""1.0"" encoding=""UTF-8""?>
+            <office:document-content xmlns:office=""urn:oasis:names:tc:opendocument:xmlns:office:1.0"" xmlns:text=""urn:oasis:names:tc:opendocument:xmlns:text:1.0"">
+                <office:body>
+                    <office:text>
+                        <text:h>Test Heading</text:h>
+                        <text:p>Test paragraph 1.</text:p>
+                        <text:p>Test paragraph 2.</text:p>
+                    </office:text>
+                </office:body>
+            </office:document-content>");
     }
 
-    // TODO: Replace with your secret key or remove if not needed
-    protected string SecretKey { get; set; }
-
-    protected static Input DefaultInput() => new();
-
-    protected static Connection DefaultConnection() => new();
+    [TearDown]
+    public void TearDownBase()
+    {
+        if (File.Exists(ValidTestFilePath))
+        {
+            File.Delete(ValidTestFilePath);
+        }
+    }
 
     protected static Options DefaultOptions() => new();
 
-    private static string GetEnvVar(string name) => Environment.GetEnvironmentVariable(name) ??
-                                                    throw new InvalidOperationException(
-                                                        $"Missing required env var: {name}");
+    protected Input DefaultInput() => new()
+    {
+        FilePath = ValidTestFilePath,
+    };
 }
