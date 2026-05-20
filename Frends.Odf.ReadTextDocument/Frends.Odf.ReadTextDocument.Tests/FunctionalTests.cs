@@ -80,6 +80,34 @@ internal class FunctionalTests : TestBase
     }
 
     [Test]
+    public void Should_Return_Failure_With_Corrupt_File_Input()
+    {
+        // Creates a temporary .odt file with standard text instead of a valid Zip archive.
+        var path = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString() + ".odt");
+        File.WriteAllText(path, "This is corrupt file input.");
+
+        try
+        {
+            var input = DefaultInput();
+            input.FilePath = path;
+
+            var options = DefaultOptions();
+            options.ThrowErrorOnFailure = false;
+
+            // Extracts the corrupt file input.
+            var result = Odf.ReadTextDocument(input, options, CancellationToken.None);
+
+            // Checks that the Task correctly handled the corrupt file and returned Success = false.
+            Assert.IsFalse(result.Success);
+            Assert.IsNotNull(result.Error);
+        }
+        finally
+        {
+            File.Delete(path);
+        }
+    }
+
+    [Test]
     public void Should_Handle_Unicode_Content()
     {
         // XML framework with Scandinavian characters.
@@ -105,6 +133,75 @@ internal class FunctionalTests : TestBase
             var result = Odf.ReadTextDocument(input, DefaultOptions(), CancellationToken.None);
 
             var expectedOutput = "AäÄaOöÖo." + Environment.NewLine + "ÖöÄä.";
+
+            // Checks that the Task returned successfully and that the extracted content matches the known input.
+            Assert.IsTrue(result.Success);
+            Assert.AreEqual(expectedOutput, result.Content);
+        }
+        finally
+        {
+            File.Delete(path);
+        }
+    }
+
+    [Test]
+    public void Should_Handle_Malformed_Xml()
+    {
+        // XML framework missing a closing <text:p> tag.
+        var xml = @"<?xml version=""1.0"" encoding=""UTF-8""?>
+            <office:document-content xmlns:office=""urn:oasis:names:tc:opendocument:xmlns:office:1.0"" xmlns:text=""urn:oasis:names:tc:opendocument:xmlns:text:1.0"">
+                <office:body>
+                    <office:text>
+                        <text:p>This tag never closes.
+                    </office:text>
+                </office:body>
+            </office:document-content>";
+
+        // Path of the created .odt file injected with the malformed XML.
+        var path = Helpers.TestHelper.CreateTestFile(xml);
+
+        try
+        {
+            var input = DefaultInput();
+            input.FilePath = path;
+
+            // Extracts the malformed XML input.
+            var exception = Assert.Throws<Exception>(() => Odf.ReadTextDocument(input, DefaultOptions(), CancellationToken.None));
+
+            Assert.IsNotNull(exception);
+        }
+        finally
+        {
+            File.Delete(path);
+        }
+    }
+
+    [Test]
+    public void Should_Handle_Odf_Whitespace_And_Tabs()
+    {
+        // XML framework with ODF tabs and multiple whitespace tags.
+        var xml = @"<?xml version=""1.0"" encoding=""UTF-8""?>
+            <office:document-content xmlns:office=""urn:oasis:names:tc:opendocument:xmlns:office:1.0"" xmlns:text=""urn:oasis:names:tc:opendocument:xmlns:text:1.0"">
+                <office:body>
+                    <office:text>
+                        <text:p>Test<text:tab/>Paragraph 1.</text:p>
+                        <text:p>Test<text:s text:c=""4""/>Paragraph 2</text:p>
+                    </office:text>
+                </office:body>
+            </office:document-content>";
+
+        // Path of the created .odt file injected with the ODF tabs and whitespace tags.
+        var path = Helpers.TestHelper.CreateTestFile(xml);
+
+        try
+        {
+            var input = DefaultInput();
+            input.FilePath = path;
+
+            // Extracts the ODF tabs and whitespaces input.
+            var result = Odf.ReadTextDocument(input, DefaultOptions(), CancellationToken.None);
+
+            var expectedOutput = "Test\tParagraph 1." + Environment.NewLine + "Test    Paragraph 2.";
 
             // Checks that the Task returned successfully and that the extracted content matches the known input.
             Assert.IsTrue(result.Success);

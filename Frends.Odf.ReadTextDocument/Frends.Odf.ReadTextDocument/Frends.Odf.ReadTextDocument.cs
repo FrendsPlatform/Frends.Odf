@@ -38,7 +38,7 @@ public static class Odf
                 throw new FileNotFoundException($"Input file not found: {input.FilePath}");
 
             // Checks if input file matches the expected ODF file type.
-            if (!Path.GetExtension(input.FilePath).Equals(".odt", StringComparison.CurrentCultureIgnoreCase))
+            if (!Path.GetExtension(input.FilePath).Equals(".odt", StringComparison.OrdinalIgnoreCase))
                 throw new ArgumentException("The input file is not in .odt format.");
 
             // Normalises the path to prevent path traversal.
@@ -52,6 +52,10 @@ public static class Odf
             // Check the unzipped file size is below 50MB to prevent zip bombing.
             if (contentXml.Length > 50 * 1024 * 1024)
                 throw new Exception("content.xml is larger than the maximum allowed file size of 50MB.");
+
+            // Cancellation token should be provided to methods that support it
+            // and checked during long-running operations, e.g., loops.
+            cancellationToken.ThrowIfCancellationRequested();
 
             using var stream = contentXml.Open();
 
@@ -73,15 +77,13 @@ public static class Odf
              * Descendants() retrieves all XElements in the document.
              * Combines the ODF namespace with "p" or "h" to create <text:p> or <text:h> which is valid XName property.
              * Filters to get only the XElements that have the paragraphs and headings XName property.
+             * Uses Ancestors() to prevent duplicate element value extraction.
              * Retrieves the text content inside each XElement.
             */
             var textElements = xDocument.Descendants()
-                .Where(x => x.Name == textNamespace + "p" || x.Name == textNamespace + "h")
+                .Where(x => (x.Name == textNamespace + "p" || x.Name == textNamespace + "h")
+                         && !x.Ancestors().Any(a => a.Name == textNamespace + "p" || a.Name == textNamespace + "h"))
                 .Select(x => x.Value);
-
-            // Cancellation token should be provided to methods that support it
-            // and checked during long-running operations, e.g., loops.
-            cancellationToken.ThrowIfCancellationRequested();
 
             var extractedContent = string.Join(Environment.NewLine, textElements);
 
