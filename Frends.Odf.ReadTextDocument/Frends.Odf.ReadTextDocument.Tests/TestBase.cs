@@ -8,16 +8,13 @@ namespace Frends.Odf.ReadTextDocument.Tests;
 
 internal abstract class TestBase
 {
-    // Input file path variable available to all test classes.
     protected string ValidTestFilePath { get; private set; }
 
     [SetUp]
     public void SetupBase()
     {
-        // Initialise a temporary path for the .odt file used in tests.
         ValidTestFilePath = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString() + ".odt");
 
-        // Create a zip archive at the temporary path.
         using var archive = ZipFile.Open(ValidTestFilePath, ZipArchiveMode.Create);
         var entry = archive.CreateEntry("content.xml");
         using var writer = new StreamWriter(entry.Open());
@@ -38,7 +35,6 @@ internal abstract class TestBase
     [TearDown]
     public void TearDownBase()
     {
-        // Delete the temporary file after each test runs.
         if (File.Exists(ValidTestFilePath))
         {
             File.Delete(ValidTestFilePath);
@@ -49,7 +45,6 @@ internal abstract class TestBase
 
     protected Input DefaultInput() => new()
     {
-        // Assigns the input file path variable to the default Input used in tests.
         FilePath = ValidTestFilePath,
     };
 }

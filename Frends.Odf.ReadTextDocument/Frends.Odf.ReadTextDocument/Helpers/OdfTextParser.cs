@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Text;
+using System.Threading;
 using System.Xml.Linq;
 
 namespace Frends.Odf.ReadTextDocument.Helpers
@@ -11,21 +12,20 @@ namespace Frends.Odf.ReadTextDocument.Helpers
         /// </summary>
         /// <param name="element">XML element to parse.</param>
         /// <param name="textNamespace">Standard ODF text namespace.</param>
+        /// <param name="cancellationToken">A cancellation token provided by Frends Platform.</param>
         /// <returns>A string containing the extracted text with converted whitespaces, tabs, and line breaks.</returns>
-        internal static string ParseOdfElements(XElement element, XNamespace textNamespace)
+        internal static string ParseOdfElements(XElement element, XNamespace textNamespace, CancellationToken cancellationToken)
         {
             var stringBuilder = new StringBuilder();
 
-            // Use DescendantNodes to retrieve entire content of the XElement.
             foreach (var node in element.DescendantNodes())
             {
-                // Check if node is raw text
+                cancellationToken.ThrowIfCancellationRequested();
+
                 if (node is XText textNode)
                 {
                     stringBuilder.Append(textNode.Value);
                 }
-
-                // If the node is not raw text, it has an XML tag inside it, making it an XElement.
                 else if (node is XElement xElement)
                 {
                     // Check for whitespace tag <text:s>.
@@ -37,27 +37,23 @@ namespace Frends.Odf.ReadTextDocument.Helpers
                         // Check for 'c' attribute in multiple whitespace tag <text:s text:c="X"/>.
                         var countAttribute = xElement.Attribute(textNamespace + "c");
 
-                        // If 'c' attribute exists, and has a valid integer, set the whitespace count to the 'c' value.
-                        if (countAttribute != null && int.TryParse(countAttribute.Value, out int c))
+                        if (countAttribute != null && int.TryParse(countAttribute.Value, out int c) && c > 0)
                         {
                             whitespaceCount = c;
                         }
 
-                        // Append whitespaces to XElement value.
                         stringBuilder.Append(new string(' ', whitespaceCount));
                     }
 
                     // Check for tab tag <text:tab>.
                     else if (xElement.Name == textNamespace + "tab")
                     {
-                        // Append tab to XElement value.
                         stringBuilder.Append('\t');
                     }
 
                     // Check for line break tag <text:line-break>.
                     else if (xElement.Name == textNamespace + "line-break")
                     {
-                        // Append new line to XElement value.
                         stringBuilder.Append(Environment.NewLine);
                     }
                 }

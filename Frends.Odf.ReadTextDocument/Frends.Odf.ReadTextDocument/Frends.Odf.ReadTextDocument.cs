@@ -16,6 +16,8 @@ namespace Frends.Odf.ReadTextDocument;
 /// </summary>
 public static class Odf
 {
+    private static readonly XNamespace TextNamespace = "urn:oasis:names:tc:opendocument:xmlns:text:1.0";
+
     /// <summary>
     /// Extracts readable text from OpenDocument Text (.odt) files.
     /// [Documentation](https://tasks.frends.com/tasks/frends-tasks/Frends-Odf-ReadTextDocument)
@@ -33,18 +35,14 @@ public static class Odf
         {
             ValidationHandler.Run(input, options);
 
-            // Checks if input file exists.
             if (!File.Exists(input.FilePath))
                 throw new FileNotFoundException($"Input file not found: {input.FilePath}");
 
-            // Checks if input file matches the expected ODF file type.
             if (!Path.GetExtension(input.FilePath).Equals(".odt", StringComparison.OrdinalIgnoreCase))
                 throw new ArgumentException("The input file is not in .odt format.");
 
-            // Normalises the path to prevent path traversal.
             var normalizedPath = Path.GetFullPath(input.FilePath);
 
-            // Open the zip archive.
             using ZipArchive archive = ZipFile.OpenRead(normalizedPath);
 
             var contentXml = archive.GetEntry("content.xml") ?? throw new Exception("content.xml is missing from the .odt file.");
@@ -53,8 +51,6 @@ public static class Odf
             if (contentXml.Length > 50 * 1024 * 1024)
                 throw new Exception("content.xml is larger than the maximum allowed file size of 50MB.");
 
-            // Cancellation token should be provided to methods that support it
-            // and checked during long-running operations, e.g., loops.
             cancellationToken.ThrowIfCancellationRequested();
 
             using var stream = contentXml.Open();
@@ -69,21 +65,11 @@ public static class Odf
             using var xmlReader = XmlReader.Create(stream, settings);
             var xDocument = XDocument.Load(xmlReader);
 
-            // Define the standard OpenDocument text namespace.
-            XNamespace textNamespace = "urn:oasis:names:tc:opendocument:xmlns:text:1.0";
-
-            // Summary: Extract paragraphs and headings in document order.
-            /*
-             * Descendants() retrieves all XElements in the document.
-             * Combines the ODF namespace with "p" or "h" to create <text:p> or <text:h> which is valid XName property.
-             * Filters to get only the XElements that have the paragraphs and headings XName property.
-             * Uses Ancestors() to prevent duplicate element value extraction.
-             * Retrieves the text content inside each XElement using helper method.
-            */
+            // Extract <text:p> and <text:h> elements in document order, ignoring nested duplicates.
             var textElements = xDocument.Descendants()
-                .Where(x => (x.Name == textNamespace + "p" || x.Name == textNamespace + "h")
-                         && !x.Ancestors().Any(a => a.Name == textNamespace + "p" || a.Name == textNamespace + "h"))
-                .Select(x => Helpers.OdfTextParser.ParseOdfElements(x, textNamespace));
+                .Where(x => (x.Name == TextNamespace + "p" || x.Name == TextNamespace + "h")
+                         && !x.Ancestors().Any(a => a.Name == TextNamespace + "p" || a.Name == TextNamespace + "h"))
+                .Select(x => Helpers.OdfTextParser.ParseOdfElements(x, TextNamespace, cancellationToken));
 
             var extractedContent = string.Join(Environment.NewLine, textElements);
 
