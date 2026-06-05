@@ -34,7 +34,7 @@ namespace Frends.Odf.ReadTextDocument.Helpers
                         // Initialise as 1 in case of malformatting in the XML.
                         int whitespaceCount = 1;
 
-                        // Check for 'c' attribute in multiple whitespace tag <text:s text:c="X"/>.
+                        // Check the 'c' (count) attribute for consecutive spaces: <text:s text:c="X" />.
                         var countAttribute = xElement.Attribute(textNamespace + "c");
 
                         if (countAttribute != null && int.TryParse(countAttribute.Value, out int c) && c > 0)
@@ -44,14 +44,10 @@ namespace Frends.Odf.ReadTextDocument.Helpers
 
                         stringBuilder.Append(new string(' ', whitespaceCount));
                     }
-
-                    // Check for tab tag <text:tab>.
                     else if (xElement.Name == textNamespace + "tab")
                     {
                         stringBuilder.Append('\t');
                     }
-
-                    // Check for line break tag <text:line-break>.
                     else if (xElement.Name == textNamespace + "line-break")
                     {
                         stringBuilder.Append(Environment.NewLine);

@@ -9,7 +9,6 @@ namespace Frends.Odf.ReadTextDocument.Tests.Helpers
     {
         private readonly List<string> filesCreated = [];
 
-        // Deletes all created files.
         public void Dispose()
         {
             foreach (var file in filesCreated)
