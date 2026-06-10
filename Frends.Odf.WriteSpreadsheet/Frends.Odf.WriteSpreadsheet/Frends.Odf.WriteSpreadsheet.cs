@@ -24,6 +24,9 @@ public static class Odf
 
     /// <summary>
     /// Generate an OpenDocument Spreadsheet (.ods) file by injecting user inputted JSON data into a built-in template.
+    /// If IncludeHeaderRow is true, JSON keys are extracted to form the first row (headers).
+    /// Each JSON object is then written as a new row below the headers.
+    /// For example, [ { "Name": "John", "Age": 40 } ] produces a two-column row containing "John" and "40".
     /// [Documentation](https://tasks.frends.com/tasks/frends-tasks/Frends-Odf-WriteSpreadsheet)
     /// </summary>
     /// <param name="input">Essential parameters.</param>
@@ -45,11 +48,11 @@ public static class Odf
             if (string.IsNullOrWhiteSpace(directory))
                 throw new ArgumentException("Invalid destination path.");
 
-            if (!Directory.Exists(directory))
-                throw new DirectoryNotFoundException($"Destination directory not found: {directory}");
-
             if (!Path.GetExtension(normalizedPath).Equals(".ods", StringComparison.OrdinalIgnoreCase))
                 throw new ArgumentException("The destination file must have a .ods extension.");
+
+            if (!Directory.Exists(directory))
+                throw new DirectoryNotFoundException($"Destination directory not found: {directory}");
 
             if (File.Exists(normalizedPath))
             {

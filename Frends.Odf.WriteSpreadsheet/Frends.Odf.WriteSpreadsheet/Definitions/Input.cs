@@ -5,22 +5,6 @@ using Newtonsoft.Json.Linq;
 namespace Frends.Odf.WriteSpreadsheet.Definitions;
 
 /// <summary>
-/// Action to take if the destination file already exists.
-/// </summary>
-public enum ActionOnExistingFile
-{
-    /// <summary>
-    /// Replaces the existing file.
-    /// </summary>
-    Overwrite,
-
-    /// <summary>
-    /// Throws an error if the file already exists.
-    /// </summary>
-    Throw,
-}
-
-/// <summary>
 /// Essential parameters.
 /// </summary>
 public class Input
