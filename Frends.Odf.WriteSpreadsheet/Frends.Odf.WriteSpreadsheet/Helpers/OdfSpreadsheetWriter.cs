@@ -69,7 +69,7 @@ internal static class OdfSpreadsheetWriter
         {
             cancellationToken.ThrowIfCancellationRequested();
 
-            if (item is not JObject jObject) 
+            if (item is not JObject jObject)
                 throw new ArgumentException("The JSON payload must contain valid JSON objects.");
 
             var dataRow = new XElement(tableNamespace + "table-row");

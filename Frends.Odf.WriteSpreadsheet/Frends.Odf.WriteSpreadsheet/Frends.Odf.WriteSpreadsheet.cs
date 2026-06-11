@@ -18,7 +18,6 @@ namespace Frends.Odf.WriteSpreadsheet;
 /// </summary>
 public static class Odf
 {
-    private static readonly XNamespace OfficeNamespace = "urn:oasis:names:tc:opendocument:xmlns:office:1.0";
     private static readonly XNamespace TableNamespace = "urn:oasis:names:tc:opendocument:xmlns:table:1.0";
     private static readonly XNamespace TextNamespace = "urn:oasis:names:tc:opendocument:xmlns:text:1.0";
 
