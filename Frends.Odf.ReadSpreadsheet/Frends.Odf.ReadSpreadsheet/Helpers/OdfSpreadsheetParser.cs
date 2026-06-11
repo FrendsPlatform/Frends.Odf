@@ -52,10 +52,7 @@ namespace Frends.Odf.ReadSpreadsheet.Helpers
 
                     if (repeatedAttribute != null && int.TryParse(repeatedAttribute.Value, out int repeatedValue))
                     {
-                        if (repeatedValue <= MaxColumns)
-                            repeatCount = repeatedValue;
-                        else
-                            repeatCount = MaxColumns;
+                        repeatCount = Math.Min(repeatedValue, MaxColumns);
                     }
 
                     // Check for spanned columns attribute indicating merged cells.
@@ -70,11 +67,11 @@ namespace Frends.Odf.ReadSpreadsheet.Helpers
                             spanCount = 1;
                     }
 
-                    for (int i = 0; i < repeatCount; i++)
+                    for (int i = 0; i < repeatCount && rowData.Count < MaxColumns; i++)
                     {
                         rowData.Add(cellValue);
 
-                        for (int j = 1; j < spanCount; j++)
+                        for (int j = 1; j < spanCount && rowData.Count < MaxColumns; j++)
                         {
                             rowData.Add(string.Empty);
                         }
