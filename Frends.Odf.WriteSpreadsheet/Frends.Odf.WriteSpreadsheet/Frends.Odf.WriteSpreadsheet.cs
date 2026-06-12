@@ -59,10 +59,24 @@ public static class Odf
                     throw new IOException($"File already exists: {normalizedPath}");
             }
 
-            if (input.Payload.Type != JTokenType.Array)
+            if (string.IsNullOrWhiteSpace(input.Payload))
+                throw new ArgumentException("The provided JSON payload cannot be empty.");
+
+            JToken parsedPayload;
+
+            try
+            {
+                parsedPayload = JToken.Parse(input.Payload);
+            }
+            catch (Newtonsoft.Json.JsonReaderException ex)
+            {
+                throw new ArgumentException($"The provided payload is not valid JSON: {ex.Message}");
+            }
+
+            if (parsedPayload.Type != JTokenType.Array)
                 throw new ArgumentException("The provided JSON payload must be a valid array of objects.");
 
-            var jsonArray = (JArray)input.Payload;
+            var jsonArray = (JArray)parsedPayload;
 
             var assembly = typeof(Odf).Assembly;
 

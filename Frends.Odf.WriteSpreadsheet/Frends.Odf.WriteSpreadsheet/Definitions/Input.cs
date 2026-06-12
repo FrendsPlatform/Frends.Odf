@@ -1,6 +1,5 @@
 ﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
-using Newtonsoft.Json.Linq;
 
 namespace Frends.Odf.WriteSpreadsheet.Definitions;
 
@@ -10,12 +9,12 @@ namespace Frends.Odf.WriteSpreadsheet.Definitions;
 public class Input
 {
     /// <summary>
-    /// JSON data array to be written into the .ods file as rows and columns.
+    /// JSON data array to be written into the file.
     /// </summary>
     /// <example>[ { "Name": "John", "Age": 40 }, { "Name": "Jane", "Age": 30 } ]</example>
     [Required]
     [DefaultValue("")]
-    public JToken Payload { get; set; }
+    public string Payload { get; set; }
 
     /// <summary>
     /// Full path of the destination for the new .ods file.

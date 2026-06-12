@@ -3,7 +3,6 @@ using System.IO;
 using System.Threading;
 using Frends.Odf.WriteSpreadsheet.Definitions;
 using Frends.Odf.WriteSpreadsheet.Tests.Helpers;
-using Newtonsoft.Json.Linq;
 using NUnit.Framework;
 
 namespace Frends.Odf.WriteSpreadsheet.Tests;
@@ -62,7 +61,7 @@ internal class FunctionalTests : TestBase
     [Test]
     public void Should_Throw_When_Input_Data_Is_Incorrect()
     {
-        var invalidPayload = JObject.Parse(@"{ ""Name"": ""John"" }");
+        var invalidPayload = @"{ ""Name"": ""John"" }";
 
         var input = DefaultInput();
         input.Payload = invalidPayload;
@@ -107,7 +106,7 @@ internal class FunctionalTests : TestBase
     [Test]
     public void Should_Write_Empty_Spreadsheet_With_Empty_Payload()
     {
-        var emptyPayload = JArray.Parse("[]");
+        var emptyPayload = "[]";
 
         var input = DefaultInput();
         input.Payload = emptyPayload;
@@ -129,10 +128,10 @@ internal class FunctionalTests : TestBase
     [Test]
     public void Should_Handle_Unicode_Content()
     {
-        var unicodePayload = JArray.Parse(@"[
+        var unicodePayload = @"[
             { ""Text1"": ""AäÄaOöÖo."" },
             { ""Text2"": ""ÖöÄä."" }
-        ]");
+        ]";
 
         var input = DefaultInput();
         input.Payload = unicodePayload;
@@ -149,9 +148,9 @@ internal class FunctionalTests : TestBase
     [Test]
     public void Should_Escape_Formula_Injection()
     {
-        var formulaPayload = JArray.Parse(@"[
+        var formulaPayload = @"[
             { ""Equals"": ""=SUM(A1:A2)"", ""Plus"": ""+100"", ""Minus"": ""-50"", ""At"": ""@Test"" }
-        ]");
+        ]";
 
         var input = DefaultInput();
         input.Payload = formulaPayload;
@@ -170,10 +169,10 @@ internal class FunctionalTests : TestBase
     [Test]
     public void Should_Handle_Partially_Empty_Json()
     {
-        var partialPayload = JArray.Parse(@"[
+        var partialPayload = @"[
             { ""Col1"": ""Row1"" },
             { ""Col2"": ""Row2"" }
-        ]");
+        ]";
 
         var input = DefaultInput();
         input.Payload = partialPayload;
