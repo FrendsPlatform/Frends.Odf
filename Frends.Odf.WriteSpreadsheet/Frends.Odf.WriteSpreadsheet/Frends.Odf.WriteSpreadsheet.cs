@@ -20,6 +20,7 @@ public static class Odf
 {
     private static readonly XNamespace TableNamespace = "urn:oasis:names:tc:opendocument:xmlns:table:1.0";
     private static readonly XNamespace TextNamespace = "urn:oasis:names:tc:opendocument:xmlns:text:1.0";
+    private static readonly XNamespace OfficeNamespace = "urn:oasis:names:tc:opendocument:xmlns:office:1.0";
 
     /// <summary>
     /// Generate an OpenDocument Spreadsheet (.ods) file by injecting user inputted JSON data into a built-in template.
@@ -52,12 +53,6 @@ public static class Odf
 
             if (!Directory.Exists(directory))
                 throw new DirectoryNotFoundException($"Destination directory not found: {directory}");
-
-            if (File.Exists(normalizedPath))
-            {
-                if (input.ActionOnExistingFile == ActionOnExistingFile.Throw)
-                    throw new IOException($"File already exists: {normalizedPath}");
-            }
 
             if (string.IsNullOrWhiteSpace(input.Payload))
                 throw new ArgumentException("The provided JSON payload cannot be empty.");
@@ -105,7 +100,7 @@ public static class Odf
 
                 var firstTable = xDocument.Descendants(TableNamespace + "table").FirstOrDefault() ?? throw new Exception("No spreadsheet table found.");
 
-                OdfSpreadsheetWriter.InjectData(firstTable, jsonArray, options.IncludeHeaderRow, TableNamespace, TextNamespace, cancellationToken);
+                OdfSpreadsheetWriter.InjectData(firstTable, jsonArray, options.IncludeHeaderRow, TableNamespace, TextNamespace, OfficeNamespace, cancellationToken);
 
                 contentXml.Delete();
                 var newContentXmlEntry = archive.CreateEntry("content.xml");
@@ -123,7 +118,6 @@ public static class Odf
             }
 
             memoryStream.Position = 0;
-
             var tempFilePath = Path.Combine(directory, $"{Path.GetFileName(normalizedPath)}.{Guid.NewGuid():N}.tmp");
 
             try
@@ -133,15 +127,24 @@ public static class Odf
                     memoryStream.CopyTo(fileStream);
                 }
 
-                var overwrite = input.ActionOnExistingFile != ActionOnExistingFile.Throw;
-
-                try
+                if (input.ActionOnExistingFile == ActionOnExistingFile.Overwrite)
                 {
-                    File.Move(tempFilePath, normalizedPath, overwrite);
+                    File.Move(tempFilePath, normalizedPath, true);
                 }
-                catch (IOException ex) when (!overwrite)
+                else if (input.ActionOnExistingFile == ActionOnExistingFile.Throw)
                 {
-                    throw new IOException($"File already exists: {normalizedPath}", ex);
+                    try
+                    {
+                        File.Move(tempFilePath, normalizedPath, false);
+                    }
+                    catch (IOException ex)
+                    {
+                        throw new IOException($"File already exists: {normalizedPath}", ex);
+                    }
+                }
+                else
+                {
+                    throw new NotSupportedException($"ActionOnExistingFile.{input.ActionOnExistingFile} is not supported.");
                 }
             }
             catch

@@ -16,6 +16,7 @@ internal static class OdfSpreadsheetWriter
     /// <param name="includeHeaderRow">Boolean indicating whether the first row should be treated as JSON keys.</param>
     /// <param name="tableNamespace">Standard ODF table namespace.</param>
     /// <param name="textNamespace">Standard ODF text namespace.</param>
+    /// <param name="officeNamespace">Standard ODF office namespace.</param>
     /// <param name="cancellationToken">A cancellation token provided by the Frends Platform.</param>
     internal static void InjectData(
         XElement firstTable,
@@ -23,6 +24,7 @@ internal static class OdfSpreadsheetWriter
         bool includeHeaderRow,
         XNamespace tableNamespace,
         XNamespace textNamespace,
+        XNamespace officeNamespace,
         CancellationToken cancellationToken)
     {
         var headers = new List<string>();
@@ -57,7 +59,7 @@ internal static class OdfSpreadsheetWriter
             {
                 cancellationToken.ThrowIfCancellationRequested();
 
-                var cell = new XElement(tableNamespace + "table-cell", new XElement(textNamespace + "p", header));
+                var cell = new XElement(tableNamespace + "table-cell", new XAttribute(officeNamespace + "value-type", "string"), new XElement(textNamespace + "p", header));
 
                 headerRow.Add(cell);
             }
@@ -73,49 +75,44 @@ internal static class OdfSpreadsheetWriter
                 throw new ArgumentException("The JSON payload must contain valid JSON objects.");
 
             var dataRow = new XElement(tableNamespace + "table-row");
-
             foreach (var header in headers)
             {
                 cancellationToken.ThrowIfCancellationRequested();
 
                 var property = jObject.Property(header);
-                var value = string.Empty;
+                var cell = new XElement(tableNamespace + "table-cell");
 
                 if (property != null && property.Value.Type != JTokenType.Null)
                 {
-                    value = property.Value.ToString();
-                    value = HandleFormulaInjection(value);
-                }
+                    var xElement = new XElement(textNamespace + "p", property.Value.ToString());
 
-                var cell = new XElement(tableNamespace + "table-cell", new XElement(textNamespace + "p", value));
+                    if (property.Value.Type == JTokenType.Integer || property.Value.Type == JTokenType.Float)
+                    {
+                        cell.Add(new XAttribute(officeNamespace + "value-type", "float"));
+                        cell.Add(new XAttribute(officeNamespace + "value", Convert.ToDouble(property.Value).ToString(System.Globalization.CultureInfo.InvariantCulture)));
+                    }
+                    else if (property.Value.Type == JTokenType.Boolean)
+                    {
+                        cell.Add(new XAttribute(officeNamespace + "value-type", "boolean"));
+                        cell.Add(new XAttribute(officeNamespace + "boolean-value", (bool)property.Value ? "true" : "false"));
+                    }
+                    else if (property.Value.Type == JTokenType.Date)
+                    {
+                        cell.Add(new XAttribute(officeNamespace + "value-type", "date"));
+                        cell.Add(new XAttribute(officeNamespace + "date-value", ((DateTime)property.Value).ToString("s")));
+                    }
+                    else
+                    {
+                        cell.Add(new XAttribute(officeNamespace + "value-type", "string"));
+                    }
+
+                    cell.Add(xElement);
+                }
 
                 dataRow.Add(cell);
             }
 
             firstTable.Add(dataRow);
         }
-    }
-
-    /// <summary>
-    /// Escapes strings starting with formula characters to write them as plain text.
-    /// </summary>
-    private static string HandleFormulaInjection(string input)
-    {
-        if (string.IsNullOrWhiteSpace(input))
-            return input;
-
-        var trimmedInput = input.TrimStart();
-
-        if (trimmedInput.Length == 0)
-            return input;
-
-        var firstChar = trimmedInput[0];
-
-        if (firstChar == '=' || firstChar == '+' || firstChar == '-' || firstChar == '@')
-        {
-            return "'" + input;
-        }
-
-        return input;
     }
 }

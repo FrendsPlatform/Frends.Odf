@@ -122,7 +122,7 @@ internal class FunctionalTests : TestBase
         var xmlString = TestHelper.ReadOdsContent(result.FilePath);
 
         Assert.That(xmlString, Does.Not.Contain("John"));
-        Assert.That(xmlString, Does.Not.Contain("table:table-cell>"));
+        Assert.That(xmlString, Does.Not.Contain("<table:table-cell"));
     }
 
     [Test]
@@ -160,10 +160,10 @@ internal class FunctionalTests : TestBase
         Assert.That(result.Success, Is.True);
         var xmlString = TestHelper.ReadOdsContent(result.FilePath);
 
-        Assert.That(xmlString, Contains.Substring("'=SUM(A1:A2)"));
-        Assert.That(xmlString, Contains.Substring("'+100"));
-        Assert.That(xmlString, Contains.Substring("'-50"));
-        Assert.That(xmlString, Contains.Substring("'@Test"));
+        Assert.That(xmlString, Contains.Substring("=SUM(A1:A2)"));
+        Assert.That(xmlString, Contains.Substring("+100"));
+        Assert.That(xmlString, Contains.Substring("-50"));
+        Assert.That(xmlString, Contains.Substring("@Test"));
     }
 
     [Test]
@@ -186,5 +186,29 @@ internal class FunctionalTests : TestBase
         Assert.That(xmlString, Contains.Substring("Col2"));
         Assert.That(xmlString, Contains.Substring("Row1"));
         Assert.That(xmlString, Contains.Substring("Row2"));
+    }
+
+    [Test]
+    public void Should_Write_Correct_Value_Types()
+    {
+        var typedPayload = @"[
+            { ""StringCol"": ""Text"", ""NumCol"": 42.5, ""BoolCol"": true, ""DateCol"": ""2026-06-12T12:00:00"" }
+        ]";
+
+        var input = DefaultInput();
+        input.Payload = typedPayload;
+
+        var result = Odf.WriteSpreadsheet(input, DefaultOptions(), CancellationToken.None);
+
+        Assert.That(result.Success, Is.True);
+        var xmlString = TestHelper.ReadOdsContent(result.FilePath);
+
+        Assert.That(xmlString, Contains.Substring("office:value-type=\"string\""));
+        Assert.That(xmlString, Contains.Substring("office:value-type=\"float\""));
+        Assert.That(xmlString, Contains.Substring("office:value=\"42.5\""));
+        Assert.That(xmlString, Contains.Substring("office:value-type=\"boolean\""));
+        Assert.That(xmlString, Contains.Substring("office:boolean-value=\"true\""));
+        Assert.That(xmlString, Contains.Substring("office:value-type=\"date\""));
+        Assert.That(xmlString, Contains.Substring("office:date-value=\"2026-06-12T12:00:00\""));
     }
 }
