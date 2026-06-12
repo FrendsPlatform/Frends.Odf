@@ -1,6 +1,5 @@
 ﻿using System.ComponentModel;
 using System.ComponentModel.DataAnnotations;
-using Newtonsoft.Json.Linq;
 
 namespace Frends.Odf.WriteTextDocument.Definitions;
 
@@ -15,7 +14,7 @@ public class Input
     /// <example>[ { "Name": "John" }, { "Name": "Jane" } ]</example>
     [Required]
     [DefaultValue("")]
-    public JToken Payload { get; set; }
+    public string Payload { get; set; }
 
     /// <summary>
     /// Full path of the destination for the new .odt file.

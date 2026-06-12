@@ -1,7 +1,6 @@
 using System;
 using System.IO;
 using Frends.Odf.WriteTextDocument.Definitions;
-using Newtonsoft.Json.Linq;
 using NUnit.Framework;
 
 namespace Frends.Odf.WriteTextDocument.Tests;
@@ -29,10 +28,10 @@ internal abstract class TestBase
 
     protected Input DefaultInput()
     {
-        var jsonPayload = JArray.Parse(@"[
+        var jsonPayload = @"[
             { ""Name"": ""John"", ""Test"": ""Test 1"" },
             { ""Name"": ""Doe"", ""Test"": ""Test 2"" }
-        ]");
+        ]";
 
         return new Input
         {

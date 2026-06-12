@@ -3,7 +3,6 @@ using System.IO;
 using System.Threading;
 using Frends.Odf.WriteTextDocument.Definitions;
 using Frends.Odf.WriteTextDocument.Tests.Helpers;
-using Newtonsoft.Json.Linq;
 using NUnit.Framework;
 
 namespace Frends.Odf.WriteTextDocument.Tests;
@@ -46,7 +45,7 @@ internal class FunctionalTests : TestBase
     [Test]
     public void Should_Throw_When_Input_Content_Is_Incorrect()
     {
-        var invalidPayload = JObject.Parse(@"{ ""Name"": ""John"" }");
+        var invalidPayload = @"{ ""Name"": ""John"" }";
 
         var input = DefaultInput();
         input.Payload = invalidPayload;
@@ -91,7 +90,7 @@ internal class FunctionalTests : TestBase
     [Test]
     public void Should_Write_Empty_Document_With_Empty_Payload()
     {
-        var emptyPayload = JArray.Parse("[]");
+        var emptyPayload = "[]";
 
         var input = DefaultInput();
         input.Payload = emptyPayload;
@@ -110,10 +109,10 @@ internal class FunctionalTests : TestBase
     [Test]
     public void Should_Handle_Unicode_Content()
     {
-        var unicodePayload = JArray.Parse(@"[
+        var unicodePayload = @"[
             { ""Text1"": ""AäÄaOöÖo."" },
             { ""Text2"": ""ÖöÄä."" }
-        ]");
+        ]";
 
         var input = DefaultInput();
         input.Payload = unicodePayload;
@@ -145,7 +144,7 @@ internal class FunctionalTests : TestBase
     [Test]
     public void Should_Throw_When_Array_Contains_Non_Objects()
     {
-        var invalidPayload = JArray.Parse(@"[ ""This is a string."" ]");
+        var invalidPayload = @"[ ""This is a string."" ]";
 
         var input = DefaultInput();
         input.Payload = invalidPayload;
@@ -158,9 +157,9 @@ internal class FunctionalTests : TestBase
     [Test]
     public void Should_Handle_Null_JSON_Values()
     {
-        var nullPayload = JArray.Parse(@"[
+        var nullPayload = @"[
             { ""Name"": ""John"", ""Role"": null }
-        ]");
+        ]";
 
         var input = DefaultInput();
         input.Payload = nullPayload;
