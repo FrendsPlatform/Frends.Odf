@@ -19,7 +19,7 @@ public class Input
     /// <summary>
     /// Full path of the destination for the new .ods file.
     /// </summary>
-    /// <example>c:\temp\foo.ods</example>
+    /// <example>C:\temp\foo.ods</example>
     [Required]
     [DefaultValue("")]
     public string FilePath { get; set; } = string.Empty;
