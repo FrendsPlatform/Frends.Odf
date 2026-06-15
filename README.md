@@ -7,6 +7,7 @@ Frends tasks for OpenDocument Format (ODF) related operations.
 - [Frends.Odf.ReadTextDocument](Frends.Odf.ReadTextDocument/README.md)
 - [Frends.Odf.ReadSpreadsheet](Frends.Odf.ReadSpreadsheet/README.md)
 - [Frends.Odf.WriteTextDocument](Frends.Odf.WriteTextDocument/README.md)
+- [Frends.Odf.WriteSpreadsheet](Frends.Odf.WriteSpreadsheet/README.md)
 
 # Contributing
 
