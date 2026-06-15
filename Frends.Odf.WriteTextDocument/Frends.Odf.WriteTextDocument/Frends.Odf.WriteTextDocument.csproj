@@ -10,7 +10,7 @@
         <PackageTags>Frends</PackageTags>
         <PackageLicenseExpression>MIT</PackageLicenseExpression>
         <GenerateDocumentationFile>true</GenerateDocumentationFile>
-        <Description>Generate an OpenDocument Text (.odt) file by injecting user inputted JSON data into a built-in template.</Description>
+        <Description>Generate an OpenDocument Text (.odt) file by injecting user-input JSON data into a built-in template.</Description>
         <PackageProjectUrl>https://frends.com/</PackageProjectUrl>
         <RepositoryUrl>https://github.com/FrendsPlatform/Frends.Odf/tree/main/Frends.Odf.WriteTextDocument</RepositoryUrl>
         <Nullable>disable</Nullable>

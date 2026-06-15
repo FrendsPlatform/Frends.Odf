@@ -1,6 +1,6 @@
 # Frends.Odf.WriteTextDocument
 
-Generate an OpenDocument Text (.odt) file by injecting user inputted JSON data into a built-in template.
+Generate an OpenDocument Text (.odt) file by injecting user-input JSON data into a built-in template.
 
 [![WriteTextDocument_build](https://github.com/FrendsPlatform/Frends.Odf/actions/workflows/WriteTextDocument_test_on_main.yml/badge.svg)](https://github.com/FrendsPlatform/Frends.Odf/actions/workflows/WriteTextDocument_test_on_main.yml)
 ![Coverage](https://app-github-custom-badges.azurewebsites.net/Badge?key=FrendsPlatform/Frends.Odf/Frends.Odf.WriteTextDocument|main)

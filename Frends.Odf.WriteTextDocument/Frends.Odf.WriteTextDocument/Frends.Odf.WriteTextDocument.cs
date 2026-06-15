@@ -21,7 +21,7 @@ public static class Odf
     private static readonly XNamespace OfficeNamespace = "urn:oasis:names:tc:opendocument:xmlns:office:1.0";
 
     /// <summary>
-    /// Generate an OpenDocument Text (.odt) file by injecting user inputted JSON data
+    /// Generate an OpenDocument Text (.odt) file by injecting user-input JSON data
     /// into a built-in template.
     /// Each JSON property is written as a separate paragraph in the format "key: value".
     /// For example, { "Name": "John" } produces a paragraph containing "Name: John".
