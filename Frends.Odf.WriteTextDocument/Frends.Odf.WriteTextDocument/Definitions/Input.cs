@@ -19,7 +19,7 @@ public class Input
     /// <summary>
     /// Full path of the destination for the new .odt file.
     /// </summary>
-    /// <example>c:\temp\foo.odt</example>
+    /// <example>C:\temp\foo.odt</example>
     [Required]
     [DefaultValue("")]
     public string FilePath { get; set; } = string.Empty;
