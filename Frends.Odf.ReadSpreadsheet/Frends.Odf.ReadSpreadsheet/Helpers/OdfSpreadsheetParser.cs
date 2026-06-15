@@ -255,7 +255,7 @@ namespace Frends.Odf.ReadSpreadsheet.Helpers
 
                         if (countAttribute != null && int.TryParse(countAttribute.Value, out int c) && c > 0)
                         {
-                            whitespaceCount = c;
+                            whitespaceCount = Math.Min(c, MaxColumns);
                         }
 
                         stringBuilder.Append(new string(' ', whitespaceCount));
