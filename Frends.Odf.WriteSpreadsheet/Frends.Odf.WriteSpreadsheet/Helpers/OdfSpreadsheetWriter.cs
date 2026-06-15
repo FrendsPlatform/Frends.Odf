@@ -108,6 +108,10 @@ internal static class OdfSpreadsheetWriter
 
                     cell.Add(xElement);
                 }
+                else
+                {
+                    cell.Add(new XElement(textNamespace + "p", string.Empty));
+                }
 
                 dataRow.Add(cell);
             }
