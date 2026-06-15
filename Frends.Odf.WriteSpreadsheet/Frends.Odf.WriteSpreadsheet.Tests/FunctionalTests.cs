@@ -146,7 +146,7 @@ internal class FunctionalTests : TestBase
     }
 
     [Test]
-    public void Should_Escape_Formula_Injection()
+    public void Should_Store_Formula_Like_Values_As_Strings()
     {
         var formulaPayload = @"[
             { ""Equals"": ""=SUM(A1:A2)"", ""Plus"": ""+100"", ""Minus"": ""-50"", ""At"": ""@Test"" }

@@ -73,6 +73,9 @@ public static class Odf
 
             var jsonArray = (JArray)parsedPayload;
 
+            if (input.ActionOnExistingFile == ActionOnExistingFile.Throw && File.Exists(normalizedPath))
+                throw new IOException($"File already exists: {normalizedPath}");
+
             var assembly = typeof(Odf).Assembly;
 
             using var templateStream = assembly.GetManifestResourceStream("Frends.Odf.WriteSpreadsheet.Resources.template.ods") ?? throw new Exception("Could not find the embedded .ods template.");
