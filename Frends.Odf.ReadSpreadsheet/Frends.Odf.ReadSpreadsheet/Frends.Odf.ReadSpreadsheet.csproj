@@ -3,9 +3,8 @@
         <TargetFramework>net8.0</TargetFramework>
         <LangVersion>latest</LangVersion>
         <Version>1.1.0</Version>
-        <Copyright>Frends</Copyright>
         <Authors>Frends</Authors>
-        <Copyright>Copyright (c) 2026 Frends EiPaaS</Copyright>
+        <Copyright>Frends</Copyright>
         <Company>Frends</Company>
         <Product>Frends</Product>
         <PackageTags>Frends</PackageTags>
